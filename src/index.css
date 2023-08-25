@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.button-style {
+  @apply relative overflow-hidden border border-white border-opacity-40 px-6 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 backdrop-blur-lg backdrop-filter text-white;
+}
+
+.icon-style {
+  @apply inline-block mr-3 text-3xl;
+}
+body {
+  margin: 0px;
+}
+
+.patterns {
+  width: 100vw;
+  height: 100vw;
+}
+
+.pt1 {
+  background-color: #026873;
+  background-size: 13px 13px, 29px 29px, 37px 37px, 53px 53px;
+  background-image: -webkit-linear-gradient(
+      0,
+      rgba(255, 255, 255, 0.07) 50%,
+      transparent 50%
+    ),
+    -webkit-linear-gradient(0, rgba(255, 255, 255, 0.13) 50%, transparent 50%),
+    -webkit-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.17) 50%),
+    -webkit-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.19) 50%);
+  background-image: -moz-linear-gradient(
+      0,
+      rgba(255, 255, 255, 0.07) 50%,
+      transparent 50%
+    ),
+    -moz-linear-gradient(0, rgba(255, 255, 255, 0.13) 50%, transparent 50%),
+    -moz-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.17) 50%),
+    -moz-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.19) 50%);
+  background-image: -ms-linear-gradient(
+      0,
+      rgba(255, 255, 255, 0.07) 50%,
+      transparent 50%
+    ),
+    -ms-linear-gradient(0, rgba(255, 255, 255, 0.13) 50%, transparent 50%),
+    -ms-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.17) 50%),
+    -ms-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.19) 50%);
+  background-image: -o-linear-gradient(
+      0,
+      rgba(255, 255, 255, 0.07) 50%,
+      transparent 50%
+    ),
+    -o-linear-gradient(0, rgba(255, 255, 255, 0.13) 50%, transparent 50%),
+    -o-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.17) 50%),
+    -o-linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.19) 50%);
+  background-image: linear-gradient(
+      0,
+      rgba(255, 255, 255, 0.07) 50%,
+      transparent 50%
+    ),
+    linear-gradient(0, rgba(255, 255, 255, 0.13) 50%, transparent 50%),
+    linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.17) 50%),
+    linear-gradient(0, transparent 50%, rgba(255, 255, 255, 0.19) 50%);
+}
+.button-49,
+.button-49:after {
+  width: 150px;
+  height: 76px;
+  line-height: 78px;
+  font-size: 20px;
+  font-family: "Bebas Neue", sans-serif;
+  background: linear-gradient(45deg, transparent 90%, #f8063b 5%);
+  border: 0;
+  color: #fff;
+  letter-spacing: 3px;
+  box-shadow: 6px 0px 0px #00e6f6;
+  outline: transparent;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-49:after {
+  --slice-0: inset(50% 50% 50% 50%);
+  --slice-1: inset(80% -6px 0 0);
+  --slice-2: inset(50% -6px 30% 0);
+  --slice-3: inset(10% -6px 85% 0);
+  --slice-4: inset(40% -6px 43% 0);
+  --slice-5: inset(80% -6px 5% 0);
+
+  content: "ALTERNATE TEXT";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    transparent 3%,
+    #00e6f6 3%,
+    #00e6f6 5%,
+    #ff013c 5%
+  );
+  text-shadow: -3px -3px 0px #f8f005, 3px 3px 0px #00e6f6;
+  clip-path: var(--slice-0);
+}
+
+.button-49:hover:after {
+  animation: 1s glitch;
+  animation-timing-function: steps(2, end);
+}
+
+@keyframes glitch {
+  0% {
+    clip-path: var(--slice-1);
+    transform: translate(-20px, -10px);
+  }
+  10% {
+    clip-path: var(--slice-3);
+    transform: translate(10px, 10px);
+  }
+  20% {
+    clip-path: var(--slice-1);
+    transform: translate(-10px, 10px);
+  }
+  30% {
+    clip-path: var(--slice-3);
+    transform: translate(0px, 5px);
+  }
+  40% {
+    clip-path: var(--slice-2);
+    transform: translate(-5px, 0px);
+  }
+  50% {
+    clip-path: var(--slice-3);
+    transform: translate(5px, 0px);
+  }
+  60% {
+    clip-path: var(--slice-4);
+    transform: translate(5px, 10px);
+  }
+  70% {
+    clip-path: var(--slice-2);
+    transform: translate(-10px, 10px);
+  }
+  80% {
+    clip-path: var(--slice-5);
+    transform: translate(20px, -10px);
+  }
+  90% {
+    clip-path: var(--slice-1);
+    transform: translate(-10px, 0px);
+  }
+  100% {
+    clip-path: var(--slice-1);
+    transform: translate(0);
+  }
+}
+
+@media (min-width: 768px) {
+  .button-49,
+  .button-49:after {
+    width: 200px;
+    height: 56px;
+    line-height: 88px;
+  }
+}
+
+.animate-charcter {
+  text-transform: uppercase;
+  background-image: linear-gradient(
+    -225deg,
+    #231557 0%,
+    #44107a 29%,
+    #ff1361 67%,
+    #fff800 100%
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  color: #fff;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textclip 2s linear infinite;
+  display: inline-block;
+  font-size: 190px;
+}
+
+@keyframes textclip {
+  to {
+    background-position: 200% center;
+  }
+}
