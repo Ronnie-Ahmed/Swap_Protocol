@@ -1,11 +1,14 @@
 import walletconnect from "../assets/walletconnect.png";
 
 import { useAddress, useConnectionStatus } from "@thirdweb-dev/react";
+import { TokenPopUp } from "../Components/TokenPopUp";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { erc20Abi } from "../Components/constants";
 // import { getTokenInfo } from "erc20-token-list";
-export const Home = () => {
+export const TestNet = () => {
+  const [isTokenOpen, setIsTokenOpen] = useState(false);
+
   const status = useConnectionStatus();
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
@@ -24,6 +27,9 @@ export const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchQuery2, setSearchQuery2] = useState("");
   const [contractAddress, setContractAddress] = useState("");
+  const handleSubmitForm = (formData) => {
+    setIsTokenOpen(false);
+  };
 
   const [amount, setAmount] = useState(0);
 
@@ -315,10 +321,26 @@ export const Home = () => {
               </div>
             </div>
           </div>
-          <button className="button-86 " role="button" onClick={swapToken}>
-            Swap Token
-          </button>
+
+          <div className="flex flex-row space-x-14">
+            <button className="button-86" role="button" onClick={swapToken}>
+              Swap Token
+            </button>
+            <button
+              className="button-87 "
+              role="button"
+              onClick={() => setIsTokenOpen(true)}
+            >
+              GET FREE TOKEN
+            </button>
+          </div>
         </div>
+      )}
+      {isTokenOpen && (
+        <TokenPopUp
+          onClose={() => setIsTokenOpen(false)}
+          onClick={handleSubmitForm}
+        />
       )}
     </div>
   );

@@ -35,8 +35,8 @@ export const Header = () => {
   return (
     <header className="fixed top-0 left-0 z-50 text-white py-1 w-full">
       <nav className="flex items-center justify-between px-4 ">
-        <Link href="/">
-          <div className="flex items-center   hover:border-blue-500 rounded-md p-2 ">
+        <Link to="/">
+          <div className="flex items-center curson-point  hover:border-blue-500 rounded-md p-2 ">
             <img
               src={nfticon}
               alt="Logo"
@@ -44,29 +44,22 @@ export const Header = () => {
             />
 
             <button className="button-49 flex items-center justify-center">
-              <label className="content">Book Library</label>
+              <label className="content">Token Swap</label>
             </button>
           </div>
         </Link>
 
-        <div className="hidden md:flex md:items-center md:space-x-4">
-          <Link to="/" spy={true} smooth={true} offset={-70} duration={500}>
-            <button
-              className="button-style"
-              style={{
-                backgroundImage: "linear-gradient(to right, #667EEA, #764BA2)",
-                boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                transform: "translateY(0)",
-                padding: "0.5rem 1rem",
-                fontSize: "0.9rem",
-                color: "white",
-                borderRadius: "0.25rem",
-                transition: "transform 0.2s ease-in-out",
-                cursor: "pointer",
-              }}
-            >
+        <div className="hidden r md:flex md:items-center md:space-x-4">
+          <Link
+            to="/testnet"
+            spy={true}
+            smooth={true}
+            offset={-70}
+            duration={500}
+          >
+            <button className="button-53" role="button">
               <FcHome className="icon-style" />
-              <span className="text-base font-bold text-white">Home</span>
+              <span className="text-base font-bold text-white">TESTNET</span>
             </button>
           </Link>
           {/* <Link
@@ -166,8 +159,8 @@ export const Header = () => {
         </div>
       </nav>
       {isOpen && (
-        <div className="md:hidden bg-gray-800 py-2 flex flex-col items-center">
-          <Link to="/" spy={true} smooth={true} offset={-70} duration={500}>
+        <div className="md:hidden mb-5 py-2 flex flex-col items-center">
+          {/* <Link to="/" spy={true} smooth={true} offset={-70} duration={500}>
             <button
               className="button-style"
               style={{
@@ -185,7 +178,7 @@ export const Header = () => {
               <FcHome className="icon-style" />
               <span className="text-base font-bold text-white">Home</span>
             </button>
-          </Link>
+          </Link> */}
 
           <ConnectWallet theme="dark" />
         </div>
