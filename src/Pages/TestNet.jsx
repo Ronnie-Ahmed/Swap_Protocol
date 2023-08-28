@@ -1,10 +1,16 @@
 import walletconnect from "../assets/walletconnect.png";
 
 import { useAddress, useConnectionStatus } from "@thirdweb-dev/react";
+
 import { TokenPopUp } from "../Components/TokenPopUp";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { erc20Abi } from "../Components/constants";
+import {
+  erc20Abi,
+  TokenList,
+  UniswapAddress,
+  uniswapAbi,
+} from "../Components/constants";
 // import { getTokenInfo } from "erc20-token-list";
 export const TestNet = () => {
   const [isTokenOpen, setIsTokenOpen] = useState(false);
@@ -21,30 +27,18 @@ export const TestNet = () => {
   const [SelectedTokenImage2, setSelectedTokenImage2] = useState(null);
   const [token1address, settoken1address] = useState(null);
   const [token2address, settoken2address] = useState(null);
-  const [tokenList, settokenList] = useState([]);
-  const [estimatedgas, setEstimatedGas] = useState(0);
   const [amountETH, setAmountETH] = useState(0);
+  const [estimatedgas, setEstimatedGas] = useState(0);
+  const [contractAddress, setContractAddress] = useState("");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchQuery2, setSearchQuery2] = useState("");
-  const [contractAddress, setContractAddress] = useState("");
+
   const handleSubmitForm = (formData) => {
     setIsTokenOpen(false);
   };
 
   const [amount, setAmount] = useState(0);
-
-  const fetchTokenList = async () => {
-    try {
-      const t = await fetch("https://tokens.coingecko.com/uniswap/all.json");
-      const token = await t.json(); //https://tokens.coingecko.com/uniswap/all.json
-      settokenList(token.tokens); //https://aurora.dev/tokens.json
-    } catch (err) {
-      console.log(err); // "https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json"
-    }
-  };
-  useEffect(() => {
-    fetchTokenList();
-  }, [selectedToken, selectedToken2]);
 
   useEffect(() => {
     calculatePrice();
@@ -80,21 +74,20 @@ export const TestNet = () => {
   const handleTokenSelect = (token) => {
     setSelectedToken(token.name);
     settoken1address(token.address);
-    setSelectedTokenImage(token.logoURI);
+    setSelectedTokenImage(token.img);
     setOpenModal(false);
   };
   const handleTokenSelect2 = (token) => {
     setSelectedToken2(token.name);
     settoken2address(token.address);
 
-    setSelectedTokenImage2(token.logoURI);
+    setSelectedTokenImage2(token.img);
   };
-
-  const filteredTokens = tokenList.filter((token) =>
-    token.name.toUpperCase().includes(searchQuery.toUpperCase())
+  const filteredTokens = TokenList.filter((token) =>
+    token.ticker.toUpperCase().includes(searchQuery.toUpperCase())
   );
-  const filteredTokens2 = tokenList.filter((token) =>
-    token.name.toUpperCase().includes(searchQuery2.toUpperCase())
+  const filteredTokens2 = TokenList.filter((token) =>
+    token.ticker.toUpperCase().includes(searchQuery2.toUpperCase())
   );
 
   const handleSearch = (query) => {
@@ -103,71 +96,49 @@ export const TestNet = () => {
   const handleSearch2 = (query) => {
     setSearchQuery2(query);
   };
-  const getQuote = async (account) => {
-    try {
-      if (token1address !== null && token2address !== null && amount !== 0) {
-        const params = {
-          sellToken: token1address,
-          buyToken: token2address,
-          sellAmount: amount * 10 ** 18,
-          takerAddress: account,
-        };
+  // const getQuote = async (account) => {
+  //   try {
+  //     if (token1address !== null && token2address !== null && amount !== 0) {
+  //       const params = {
+  //         sellToken: token1address,
+  //         buyToken: token2address,
+  //         sellAmount: amount * 10 ** 18,
+  //         takerAddress: account,
+  //       };
 
-        const queryParams = new URLSearchParams(params).toString();
+  //       const queryParams = new URLSearchParams(params).toString();
 
-        const headers = {
-          "0x-api-key": "6779ff19-4156-4732-b327-5256f34a79f1",
-        };
-        const response = await fetch(
-          `https://api.0x.org/swap/v1/quote?${queryParams}`,
-          { headers }
-        );
-        const info = await response.json();
-        return info;
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  //       const headers = {
+  //         "0x-api-key": "6779ff19-4156-4732-b327-5256f34a79f1",
+  //       };
+  //       // const response = await fetch(
+  //       //   `https://api.0x.org/swap/v1/quote?${queryParams}`,
+  //       //   { headers }
+  //       // );
+  //       const response = await fetch(
+  //         `https://api.0x.org/swap/v1/quote?buyToken=${params.buyToken}&sellAmount=${params.sellAmount}&sellToken=${params.sellToken}&takerAddress=${params.takerAddress}`,
+  //         { headers }
+  //       );
+  //       const info = await response.json();
+  //       return info;
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   const swapToken = async () => {
-    const quoteJson = await getQuote(address);
-    // console.log(quoteJson);
-    if (status === "connected") {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const chainInfo = await provider.getNetwork();
-      if (chainInfo.chainId !== 5) {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x5" }],
-        });
-      }
-
-      const contract = new ethers.Contract(
-        "0x693ea3384f0C1Ad2B58d15623Dc326E2A380e1E0",
-        erc20Abi,
-        signer
-      );
-      console.log(contract);
-
-      // const transaction = await contract.approve(
-      //   quoteJson.allowanceTarget,
-      //   ethers.utils.parseEther(amount.toString())
-      // );
-      // await transaction.wait();
-      // console.log(quoteJson.gas);
-      // const receipt = await signer.sendTransaction({
-      //   gasLimit: quoteJson.gas,
-      //   gasPrice: quoteJson.gasPrice,
-      //   to: quoteJson.to,
-      //   data: quoteJson.data,
-      //   value: quoteJson.value,
-      //   chainId: quoteJson.chainId,
-      // });
-
-      // console.log("receipt: ", receipt);
-    }
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(UniswapAddress, uniswapAbi, signer);
+    const swapToken = await contract.swap(
+      token1address,
+      token2address,
+      ethers.utils.parseEther(amount.toString()),
+      1,
+      address
+    );
+    console.log("swapToken", swapToken);
   };
 
   return (
@@ -233,11 +204,11 @@ export const TestNet = () => {
                             onClick={() => handleTokenSelect(token)}
                           >
                             <img
-                              src={token.logoURI} // Assuming logoURI contains the image URL
-                              alt={`${token.name} Logo`}
+                              src={token.img} // Assuming logoURI contains the image URL
+                              alt={`${token.ticker} Logo`}
                               className="w-8 h-8 mr-3"
                             />
-                            <span className="text-sm">{token.symbol}</span>
+                            <span className="text-sm">{token.ticker}</span>
                           </li>
                         ))}
                       </ul>
@@ -299,11 +270,11 @@ export const TestNet = () => {
                             onClick={() => handleTokenSelect2(token)}
                           >
                             <img
-                              src={token.logoURI} // Assuming logoURI contains the image URL
+                              src={token.img} // Assuming logoURI contains the image URL
                               alt={`${token.name} Logo`}
                               className="w-8 h-8 mr-3"
                             />
-                            <span className="text-sm">{token.symbol}</span>
+                            <span className="text-sm">{token.ticker}</span>
                           </li>
                         ))}
                       </ul>

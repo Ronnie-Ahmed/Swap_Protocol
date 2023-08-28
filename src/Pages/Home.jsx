@@ -3,7 +3,7 @@ import walletconnect from "../assets/walletconnect.png";
 import { useAddress, useConnectionStatus } from "@thirdweb-dev/react";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { erc20Abi } from "../Components/constants";
+import { erc20Abi, TokenListMainnet } from "../Components/constants";
 // import { getTokenInfo } from "erc20-token-list";
 export const Home = () => {
   const status = useConnectionStatus();
@@ -27,18 +27,19 @@ export const Home = () => {
 
   const [amount, setAmount] = useState(0);
 
-  const fetchTokenList = async () => {
-    try {
-      const t = await fetch("https://tokens.coingecko.com/uniswap/all.json");
-      const token = await t.json(); //https://tokens.coingecko.com/uniswap/all.json
-      settokenList(token.tokens); //https://aurora.dev/tokens.json
-    } catch (err) {
-      console.log(err); // "https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json"
-    }
-  };
-  useEffect(() => {
-    fetchTokenList();
-  }, [selectedToken, selectedToken2]);
+  // const fetchTokenList = async () => {
+  //   try {
+  //     const t = await fetch("https://tokens.coingecko.com/uniswap/all.json");
+  //     const token = await t.json(); //https://tokens.coingecko.com/uniswap/all.json
+  //     settokenList(token.tokens); //https://aurora.dev/tokens.json
+  //     console.log(token.tokens);
+  //   } catch (err) {
+  //     console.log(err); // "https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json"
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchTokenList();
+  // }, [selectedToken, selectedToken2]);
 
   useEffect(() => {
     calculatePrice();
@@ -74,21 +75,21 @@ export const Home = () => {
   const handleTokenSelect = (token) => {
     setSelectedToken(token.name);
     settoken1address(token.address);
-    setSelectedTokenImage(token.logoURI);
+    setSelectedTokenImage(token.img);
     setOpenModal(false);
   };
   const handleTokenSelect2 = (token) => {
     setSelectedToken2(token.name);
     settoken2address(token.address);
 
-    setSelectedTokenImage2(token.logoURI);
+    setSelectedTokenImage2(token.img);
   };
 
-  const filteredTokens = tokenList.filter((token) =>
-    token.name.toUpperCase().includes(searchQuery.toUpperCase())
+  const filteredTokens = TokenListMainnet.filter((token) =>
+    token.ticker.toUpperCase().includes(searchQuery.toUpperCase())
   );
-  const filteredTokens2 = tokenList.filter((token) =>
-    token.name.toUpperCase().includes(searchQuery2.toUpperCase())
+  const filteredTokens2 = TokenListMainnet.filter((token) =>
+    token.ticker.toUpperCase().includes(searchQuery2.toUpperCase())
   );
 
   const handleSearch = (query) => {
@@ -97,14 +98,14 @@ export const Home = () => {
   const handleSearch2 = (query) => {
     setSearchQuery2(query);
   };
-  const getQuote = async (account) => {
+  const getQuote = async () => {
     try {
       if (token1address !== null && token2address !== null && amount !== 0) {
         const params = {
           sellToken: token1address,
           buyToken: token2address,
           sellAmount: amount * 10 ** 18,
-          takerAddress: account,
+          // takerAddress: account,
         };
 
         const queryParams = new URLSearchParams(params).toString();
@@ -125,7 +126,7 @@ export const Home = () => {
   };
 
   const swapToken = async () => {
-    const quoteJson = await getQuote(address);
+    const quoteJson = await getQuote();
     // console.log(quoteJson);
     if (status === "connected") {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -143,24 +144,23 @@ export const Home = () => {
         erc20Abi,
         signer
       );
-      console.log(contract);
 
-      // const transaction = await contract.approve(
-      //   quoteJson.allowanceTarget,
-      //   ethers.utils.parseEther(amount.toString())
-      // );
-      // await transaction.wait();
-      // console.log(quoteJson.gas);
-      // const receipt = await signer.sendTransaction({
-      //   gasLimit: quoteJson.gas,
-      //   gasPrice: quoteJson.gasPrice,
-      //   to: quoteJson.to,
-      //   data: quoteJson.data,
-      //   value: quoteJson.value,
-      //   chainId: quoteJson.chainId,
-      // });
+      const transaction = await contract.approve(
+        quoteJson.allowanceTarget,
+        ethers.utils.parseEther(amount.toString())
+      );
+      await transaction.wait();
+      console.log(quoteJson.gas);
+      const receipt = await signer.sendTransaction({
+        gasLimit: quoteJson.gas,
+        gasPrice: quoteJson.gasPrice,
+        to: quoteJson.to,
+        data: quoteJson.data,
+        value: quoteJson.value,
+        chainId: quoteJson.chainId,
+      });
 
-      // console.log("receipt: ", receipt);
+      console.log("receipt: ", receipt);
     }
   };
 
@@ -227,11 +227,11 @@ export const Home = () => {
                             onClick={() => handleTokenSelect(token)}
                           >
                             <img
-                              src={token.logoURI} // Assuming logoURI contains the image URL
+                              src={token.img} // Assuming logoURI contains the image URL
                               alt={`${token.name} Logo`}
                               className="w-8 h-8 mr-3"
                             />
-                            <span className="text-sm">{token.symbol}</span>
+                            <span className="text-sm">{token.ticker}</span>
                           </li>
                         ))}
                       </ul>
@@ -293,11 +293,11 @@ export const Home = () => {
                             onClick={() => handleTokenSelect2(token)}
                           >
                             <img
-                              src={token.logoURI} // Assuming logoURI contains the image URL
+                              src={token.img} // Assuming logoURI contains the image URL
                               alt={`${token.name} Logo`}
                               className="w-8 h-8 mr-3"
                             />
-                            <span className="text-sm">{token.symbol}</span>
+                            <span className="text-sm">{token.ticker}</span>
                           </li>
                         ))}
                       </ul>

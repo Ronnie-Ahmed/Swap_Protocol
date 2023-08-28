@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
-import { GrTransaction } from "react-icons/gr";
-import { FcMoneyTransfer } from "react-icons/fc";
+// import { GrTransaction } from "react-icons/gr";
+// import { FcMoneyTransfer } from "react-icons/fc";
 
 import nfticon from "../assets/DEFI.jpg";
 import { FcHome } from "react-icons/fc";
