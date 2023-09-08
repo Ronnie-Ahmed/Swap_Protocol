@@ -3,6 +3,7 @@ import walletconnect from "../assets/walletconnect.png";
 import { useAddress, useConnectionStatus } from "@thirdweb-dev/react";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
+import ethereum from "../assets/Ethereum.png";
 import { erc20Abi, TokenListMainnet } from "../Components/constants";
 // import { getTokenInfo } from "erc20-token-list";
 export const Home = () => {
@@ -24,6 +25,7 @@ export const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchQuery2, setSearchQuery2] = useState("");
   const [contractAddress, setContractAddress] = useState("");
+  const [pageChainId, setPageChainId] = useState(0);
 
   const [amount, setAmount] = useState(0);
 
@@ -124,6 +126,23 @@ export const Home = () => {
       console.log(err);
     }
   };
+  const changeChainID = async () => {
+    if (status === "connected") {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const chainId = await signer.getChainId();
+      setPageChainId(chainId);
+      if (chainId !== 1) {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0x1" }],
+        });
+      }
+    }
+  };
+  useEffect(() => {
+    changeChainID();
+  }, [pageChainId]);
 
   const swapToken = async () => {
     const quoteJson = await getQuote();
@@ -132,10 +151,10 @@ export const Home = () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const chainInfo = await provider.getNetwork();
-      if (chainInfo.chainId !== 5) {
+      if (chainInfo.chainId !== 1) {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x5" }],
+          params: [{ chainId: "0x1" }],
         });
       }
 
@@ -183,6 +202,16 @@ export const Home = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center mt-32 justify-center m-5 mx-4 px-1 md:mx-16 rounded-lg transform transition-all duration-300 shadow-2xl shadow-cyan-400">
+          <div className="flex flex-col mb-5 items-center shadow-lg shadow-blue-950 backdrop-blur-lg bg-opacity-20 bg-white rounded-lg p-4">
+            <h1 className="text-4xl mb-1 font-bold mr-2 text-gray-600 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+              MAINNET
+            </h1>
+            <img
+              src="https://cryptologos.cc/logos/versions/ethereum-eth-logo-diamond-purple.svg?v=026" // Replace with your online logo image URL
+              alt="Logo"
+              className="w-8 h-10" // Adjust the width and height as needed
+            />
+          </div>
           <div className="w-full mb-5 max-w-md rounded-lg bg-gradient-to-br from-teal-500 via-yellow-500 to-red-500 bg-opacity-70 border border-gray-300 backdrop-blur-md shadow-2xl">
             <div className="p-4 flex items-center justify-between border-b">
               <div
@@ -201,43 +230,6 @@ export const Home = () => {
                     />
                   )}
                 </div>
-                {openModal && (
-                  <div className="fixed inset-0 z-50  bg-opacity-50 flex items-center justify-center">
-                    <div
-                      className=" rounded-lg shadow-lg p-8 w-3/5"
-                      style={{
-                        background:
-                          "linear-gradient(to bottom right, #14b8a6, #fbbf24, #ef4444)",
-                      }}
-                    >
-                      <input
-                        type="text"
-                        placeholder="Search tokens..."
-                        className="px-4 py-2 mb-4 w-full border rounded focus:outline-none focus:ring focus:border-blue-300"
-                        onChange={(e) => handleSearch(e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-
-                      <ul className="space-y-3 max-h-60 overflow-y-auto">
-                        {/* Implement a maximum height and scrolling */}
-                        {filteredTokens.map((token, index) => (
-                          <li
-                            key={index}
-                            className="flex items-center px-4 py-3 hover:bg-gray-100 rounded cursor-pointer"
-                            onClick={() => handleTokenSelect(token)}
-                          >
-                            <img
-                              src={token.img} // Assuming logoURI contains the image URL
-                              alt={`${token.name} Logo`}
-                              className="w-8 h-8 mr-3"
-                            />
-                            <span className="text-sm">{token.ticker}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
               </div>
 
               <input
@@ -246,6 +238,7 @@ export const Home = () => {
                   setAmount(e.target.value);
                 }}
                 value={amount}
+                onClick={(e) => e.stopPropagation()}
                 className="flex-1 px-4 py-2 bg-opacity-70 bg-white border border-gray-300 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-800"
                 placeholder="Amount"
               />
@@ -267,43 +260,6 @@ export const Home = () => {
                     />
                   )}
                 </div>
-                {openModal2 && (
-                  <div className="fixed inset-0 z-50  bg-opacity-50 flex items-center justify-center">
-                    <div
-                      className=" rounded-lg shadow-lg p-8 w-3/5"
-                      style={{
-                        background:
-                          "linear-gradient(to bottom right, #14b8a6, #fbbf24, #ef4444)",
-                      }}
-                    >
-                      <input
-                        type="text"
-                        placeholder="Search tokens..."
-                        className="px-4 py-2 mb-4 w-full border rounded focus:outline-none focus:ring focus:border-blue-300"
-                        onChange={(e) => handleSearch2(e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-
-                      <ul className="space-y-3 max-h-60 overflow-y-auto">
-                        {/* Implement a maximum height and scrolling */}
-                        {filteredTokens2.map((token, index) => (
-                          <li
-                            key={index}
-                            className="flex items-center px-4 py-3 hover:bg-gray-100 rounded cursor-pointer"
-                            onClick={() => handleTokenSelect2(token)}
-                          >
-                            <img
-                              src={token.img} // Assuming logoURI contains the image URL
-                              alt={`${token.name} Logo`}
-                              className="w-8 h-8 mr-3"
-                            />
-                            <span className="text-sm">{token.ticker}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
               </div>
               <div className="flex flex-col rounded-md bg-black">
                 <p className="text-white font-bold text-center">
@@ -318,6 +274,92 @@ export const Home = () => {
           <button className="button-86 " role="button" onClick={swapToken}>
             Swap Token
           </button>
+        </div>
+      )}
+      {openModal && (
+        <div
+          className="fixed inset-0 z-50 bg-opacity-50 text-black font-bold flex items-center justify-center backdrop-blur-md"
+          onClick={() => setOpenModal(!openModal)}
+        >
+          <div
+            className="rounded-lg shadow-lg p-8 w-3/5 bg-white backdrop-blur-md"
+            style={{
+              background:
+                "linear-gradient(to bottom right, #14b8a6, #fbbf24, #ef4444)",
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Search tokens..."
+              className="px-4 py-2 mb-4 w-full border rounded focus:outline-none focus:ring focus:border-blue-300"
+              style={{ color: "black" }}
+              onChange={(e) => handleSearch(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+            />
+
+            <ul className="space-y-3 max-h-60 overflow-y-auto">
+              {/* Implement a maximum height and scrolling */}
+              {filteredTokens.map((token, index) => (
+                <li
+                  key={index}
+                  className="flex items-center px-4 py-3 hover:bg-gray-100 rounded cursor-pointer"
+                  onClick={() => handleTokenSelect(token)}
+                >
+                  <img
+                    src={token.img} // Assuming logoURI contains the image URL
+                    alt={`${token.name} Logo`}
+                    className="w-8 h-8 mr-3"
+                  />
+                  <span className="text-sm font-bold text-black">
+                    {token.ticker}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+      {openModal2 && (
+        <div
+          className="fixed inset-0 z-50 bg-opacity-50 text-black font-bold flex items-center justify-center backdrop-blur-md"
+          onClick={() => setOpenModal2(!openModal2)}
+        >
+          <div
+            className="rounded-lg shadow-lg p-8 w-3/5 bg-white backdrop-blur-md"
+            style={{
+              background:
+                "linear-gradient(to bottom right, #14b8a6, #fbbf24, #ef4444)",
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Search tokens..."
+              className="px-4 py-2 mb-4 w-full border rounded focus:outline-none focus:ring focus:border-blue-300"
+              style={{ color: "black" }}
+              onChange={(e) => handleSearch2(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+            />
+
+            <ul className="space-y-3 max-h-60 overflow-y-auto">
+              {/* Implement a maximum height and scrolling */}
+              {filteredTokens2.map((token, index) => (
+                <li
+                  key={index}
+                  className="flex items-center px-4 py-3 hover:bg-gray-100 rounded cursor-pointer"
+                  onClick={() => handleTokenSelect2(token)}
+                >
+                  <img
+                    src={token.img} // Assuming logoURI contains the image URL
+                    alt={`${token.name} Logo`}
+                    className="w-8 h-8 mr-3"
+                  />
+                  <span className="text-sm font-bold text-black">
+                    {token.ticker}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
     </div>

@@ -12,6 +12,10 @@ export const Header = () => {
   const address = useAddress();
   const [isOpen, setIsOpen] = useState(false);
   const [active, setActive] = useState(true);
+  const [nextPage, setNextpage] = useState(false);
+  const pageToggle = () => {
+    setNextpage(!nextPage);
+  };
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -49,63 +53,61 @@ export const Header = () => {
           </div>
         </Link>
 
-        <div className="hidden r md:flex md:items-center md:space-x-4">
+        <div className="hidden md:flex md:items-center md:space-x-4">
+          {nextPage ? (
+            <Link to="/" spy={true} smooth={true} offset={-70} duration={500}>
+              <button
+                className="button-48 rounded-md shadow-lg shadow-slate-600"
+                onClick={pageToggle}
+              >
+                <span className="text-lg font-bold ">MAINNET</span>
+              </button>
+              {/* <button className="button-82-pushable" role="button">
+                <span className="button-82-shadow"></span>
+                <span className="button-82-edge"></span>
+                <span className="button-82-front text" onClick={pageToggle}>
+                  MAINNET
+                </span>
+              </button> */}
+            </Link>
+          ) : (
+            <Link
+              to="/TestNet"
+              spy={true}
+              smooth={true}
+              offset={-70}
+              duration={500}
+            >
+              <button
+                className="button-48 rounded-md shadow-lg shadow-slate-600"
+                onClick={pageToggle}
+              >
+                <span className="text-lg font-bold ">TESTNET</span>
+              </button>
+              {/* <button className="button-82-pushable" role="button">
+                <span className="button-82-shadow"></span>
+                <span className="button-82-edge"></span>
+                <span className="button-82-front text" onClick={pageToggle}>
+                  TESTNET
+                </span>
+              </button> */}
+            </Link>
+          )}
           <Link
-            to="/testnet"
-            spy={true}
-            smooth={true}
-            offset={-70}
-            duration={500}
-          >
-            <button className="button-53" role="button">
-              <FcHome className="icon-style" />
-              <span className="text-base font-bold text-white">TESTNET</span>
-            </button>
-          </Link>
-          {/* <Link
-            to="/Dex_page"
+            to="/testnetpool"
             spy={true}
             smooth={true}
             offset={-70}
             duration={500}
           >
             <button
-              className="button-style"
-              style={{
-                backgroundImage: "linear-gradient(to right, #4ADE80, #37C7B4)",
-                boxShadow: "0 5px 15px rgba(0, 0, 0, 0.2)",
-                transform: "translateY(0)",
-                padding: "0.5rem 1rem",
-                fontSize: "0.9rem",
-              }}
+              className="button-48 rounded-md shadow-lg shadow-slate-600"
+              onClick={pageToggle}
             >
-              <GrTransaction className="icon-style" />
-              <span className="text-base font-bold text-white">SWAP</span>
+              <span className="text-lg font-bold ">Create Pool</span>
             </button>
           </Link>
-          <Link
-            to="/Uploadbook"
-            spy={true}
-            smooth={true}
-            offset={-70}
-            duration={500}
-          >
-            <button
-              className="button-style"
-              style={{
-                backgroundImage: "linear-gradient(to right, #4ADE80, #37C7B4)",
-                boxShadow: "0 5px 15px rgba(0, 0, 0, 0.2)",
-                transform: "translateY(0)",
-                padding: "0.5rem 1rem",
-                fontSize: "0.9rem",
-              }}
-            >
-              <FcMoneyTransfer className="icon-style" />
-              <span className="text-base font-bold text-white">
-                Upload Book
-              </span>
-            </button>
-          </Link> */}
+
           <div className="flex flex-row space-between center p-1">
             {active && <ConnectWallet theme="dark" />}
             {address ? (
