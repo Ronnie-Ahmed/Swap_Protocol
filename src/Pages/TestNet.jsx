@@ -34,6 +34,7 @@ export const TestNet = () => {
   const [token2reserve, setToken2Reserve] = useState(0);
   const [token1symbol, setToken1Symbol] = useState(null);
   const [token2symbol, setToken2Symbol] = useState(null);
+  const [isApproved, setIsApproved] = useState(true);
 
   // const [isApproved, setIsApproved] = useState(true);
 
@@ -64,6 +65,8 @@ export const TestNet = () => {
       setToken2Reserve(reserveAmount2);
     } catch (err) {
       // console.log(err);
+      setToken1Reserve(0);
+      setToken2Reserve(0);
     }
   };
   useEffect(() => {
@@ -121,7 +124,7 @@ export const TestNet = () => {
         }
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       if (err.message === "User rejected the request.") {
         alert("Please Connect to Mumbai Testnet");
       }
@@ -150,7 +153,7 @@ export const TestNet = () => {
       const expectedAmount = ethers.utils.formatEther(expected).toString();
       setTokenExpected(expectedAmount);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   };
   useEffect(() => {
@@ -159,6 +162,48 @@ export const TestNet = () => {
   }, [amount]);
 
   const swapToken = async () => {
+    setIsApproved(true);
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const tokenSwapContract = new ethers.Contract(
+        tokenSwapAddress,
+        tokenSwapAbi,
+        signer
+      );
+      const tokenAmount = ethers.utils.parseEther(amount).toString();
+
+      const checkpair = await tokenSwapContract.checkPair(
+        token1address,
+        token2address
+      );
+      //  console.log(checkpair);
+      if (checkpair == false) {
+        alert("Pair Doesn't  Exist");
+        return;
+      }
+
+      const swapToken = await tokenSwapContract.swap(
+        token1address,
+        token2address,
+        tokenAmount
+      );
+      console.log(swapToken);
+      alert("Swap Successful");
+    } catch (err) {
+      // console.log(err);
+      if (err.reason === "execution reverted: Pool value Exceed") {
+        alert("Pool value Exceed");
+      }
+      if (
+        err.reason === "execution reverted: Amount Should be Greater than 0"
+      ) {
+        alert("Amount Should be Greater than 0");
+      }
+    }
+  };
+
+  const approveToken = async () => {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
@@ -188,13 +233,7 @@ export const TestNet = () => {
       );
       console.log(approveToken);
       alert("Approve Successful");
-      const swapToken = await tokenSwapContract.swap(
-        token1address,
-        token2address,
-        tokenAmount
-      );
-      console.log(swapToken);
-      alert("Swap Successful");
+      setIsApproved(false);
     } catch (err) {
       console.log(err);
     }
@@ -319,9 +358,19 @@ export const TestNet = () => {
           </div>
 
           <div className="flex flex-row space-x-14">
-            <button className="button-86" role="button" onClick={swapToken}>
-              Swap Token
-            </button>
+            {isApproved === true ? (
+              <button
+                className="button-86"
+                role="button"
+                onClick={approveToken}
+              >
+                Approve Token
+              </button>
+            ) : (
+              <button className="button-02" role="button" onClick={swapToken}>
+                Swap Token
+              </button>
+            )}
 
             <button
               className="button-87 "
