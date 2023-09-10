@@ -67,20 +67,27 @@ export const TestNetPool = () => {
   };
 
   const changeChainID = async () => {
-    if (status === "connected") {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const chainId = await signer.getChainId();
-      setPageChainId(chainId);
-      if (chainId !== 0x13881) {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [
-            {
-              chainId: "0x13881",
-            },
-          ],
-        });
+    try {
+      if (status === "connected") {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const chainId = await signer.getChainId();
+        setPageChainId(chainId);
+        if (chainId !== 0x13881) {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [
+              {
+                chainId: "0x13881",
+              },
+            ],
+          });
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      if (err.message === "User rejected the request.") {
+        alert("Please Connect to Mumbai Testnet");
       }
     }
   };
@@ -313,19 +320,23 @@ export const TestNetPool = () => {
             </div>
           </div>
 
-          <div className="flex flex-row space-x-14">
-            <button className="button-02" role="button" onClick={addliquidity}>
+          <div className="flex flex-col md:flex-row md:space-x-14">
+            <button
+              className="button-02 mb-2 md:mb-0"
+              role="button"
+              onClick={addliquidity}
+            >
               Add Liquidity
             </button>
-            <button className="button-86" role="button" onClick={approveToken}>
+            <button
+              className="button-86 mb-2 md:mb-0"
+              role="button"
+              onClick={approveToken}
+            >
               Create Pool
             </button>
-
-            {/* <button className="button-86" role="button" onClick={createpool}>
-              Create Pool
-            </button> */}
             <button
-              className="button-87 "
+              className="button-87"
               role="button"
               onClick={() => setIsTokenOpen(true)}
             >

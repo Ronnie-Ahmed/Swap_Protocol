@@ -32,6 +32,8 @@ export const TestNet = () => {
   const [tokenExpected, setTokenExpected] = useState(0);
   const [token1reserve, setToken1Reserve] = useState(0);
   const [token2reserve, setToken2Reserve] = useState(0);
+  const [token1symbol, setToken1Symbol] = useState(null);
+  const [token2symbol, setToken2Symbol] = useState(null);
 
   // const [isApproved, setIsApproved] = useState(true);
 
@@ -50,6 +52,7 @@ export const TestNet = () => {
         tokenSwapAbi,
         signer
       );
+
       const reserve = await tokenSwapContract.showReserve(
         token1address,
         token2address
@@ -72,6 +75,7 @@ export const TestNet = () => {
     setSelectedToken(token.name);
     settoken1address(token.address);
     setSelectedTokenImage(token.img);
+    setToken1Symbol(token.ticker);
   };
 
   const handleTokenSelect2 = async (token) => {
@@ -79,6 +83,7 @@ export const TestNet = () => {
     setSelectedToken2(token.name);
     settoken2address(token.address);
     setSelectedTokenImage2(token.img);
+    setToken2Symbol(token.ticker);
   };
 
   const filteredTokens = TokenList.filter((token) =>
@@ -98,20 +103,27 @@ export const TestNet = () => {
   };
 
   const changeChainID = async () => {
-    if (status === "connected") {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const chainId = await signer.getChainId();
-      setPageChainId(chainId);
-      if (chainId !== 0x13881) {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [
-            {
-              chainId: "0x13881",
-            },
-          ],
-        });
+    try {
+      if (status === "connected") {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const chainId = await signer.getChainId();
+        setPageChainId(chainId);
+        if (chainId !== 0x13881) {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [
+              {
+                chainId: "0x13881",
+              },
+            ],
+          });
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      if (err.message === "User rejected the request.") {
+        alert("Please Connect to Mumbai Testnet");
       }
     }
   };
@@ -208,11 +220,11 @@ export const TestNet = () => {
       ) : (
         <div className="flex  flex-col items-center mt-32 justify-center m-5 mx-4 px-1 md:mx-16 rounded-lg transform transition-all duration-300 shadow-2xl shadow-cyan-400">
           <div className="flex flex-col mb-5 items-center shadow-lg shadow-purple-950 backdrop-blur-lg bg-opacity-20 bg-white rounded-lg p-4">
-            <h1 className="text-4xl font-bold mr-2 text-gray-600 bg-clip-text text-transparent bg-gradient-to-r from-gray-500 to-gray-800">
-              Sepolia TESTNET
+            <h1 className="text-4xl font-bold mr-2 text-gray-600 bg-clip-text text-transparent bg-gradient-to-r from-gray-500 to-purple-800">
+              Mumbai TESTNET
             </h1>
             <img
-              src="https://cryptologos.cc/logos/senso-senso-logo.svg?v=026" // Replace with your online logo image URL
+              src="https://cryptologos.cc/logos/polygon-matic-logo.svg?v=026" // Replace with your online logo image URL
               alt="Logo"
               className="w-8 h-10" // Adjust the width and height as needed
             />
@@ -285,7 +297,7 @@ export const TestNet = () => {
               </div>
               <div className="flex-1 px-4 py-2  bg-white border border-gray-600 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-900">
                 <span className="text-xl font-bold text-gray-900 m-1">
-                  {token1reserve} MATIC
+                  {token1reserve} {token1symbol}
                 </span>
               </div>
             </div>
@@ -300,7 +312,7 @@ export const TestNet = () => {
               </div>
               <div className="flex-1 px-4 py-2  bg-white border border-gray-600 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-900">
                 <span className="text-xl text-center font-bold text-gray-900 m-1">
-                  {token2reserve} MATIC
+                  {token2reserve} {token2symbol}
                 </span>
               </div>
             </div>

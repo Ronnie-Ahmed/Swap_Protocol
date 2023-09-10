@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ConnectWallet, useAddress } from "@thirdweb-dev/react";
-// import { GrTransaction } from "react-icons/gr";
-// import { FcMoneyTransfer } from "react-icons/fc";
 
 import nfticon from "../assets/DEFI.jpg";
-import { FcHome } from "react-icons/fc";
 import "../index.css";
 
 export const Header = () => {
@@ -62,13 +59,6 @@ export const Header = () => {
               >
                 <span className="text-lg font-bold ">MAINNET</span>
               </button>
-              {/* <button className="button-82-pushable" role="button">
-                <span className="button-82-shadow"></span>
-                <span className="button-82-edge"></span>
-                <span className="button-82-front text" onClick={pageToggle}>
-                  MAINNET
-                </span>
-              </button> */}
             </Link>
           ) : (
             <Link
@@ -84,13 +74,6 @@ export const Header = () => {
               >
                 <span className="text-lg font-bold ">TESTNET</span>
               </button>
-              {/* <button className="button-82-pushable" role="button">
-                <span className="button-82-shadow"></span>
-                <span className="button-82-edge"></span>
-                <span className="button-82-front text" onClick={pageToggle}>
-                  TESTNET
-                </span>
-              </button> */}
             </Link>
           )}
           <Link
@@ -162,25 +145,45 @@ export const Header = () => {
       </nav>
       {isOpen && (
         <div className="md:hidden mb-5 py-2 flex flex-col items-center">
-          {/* <Link to="/" spy={true} smooth={true} offset={-70} duration={500}>
-            <button
-              className="button-style"
-              style={{
-                backgroundImage: "linear-gradient(to right, #667EEA, #764BA2)",
-                boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                transform: "translateY(0)",
-                padding: "0.5rem 1rem",
-                fontSize: "0.9rem",
-                color: "white",
-                borderRadius: "0.25rem",
-                transition: "transform 0.2s ease-in-out",
-                cursor: "pointer",
-              }}
+          {nextPage ? (
+            <Link to="/" spy={true} smooth={true} offset={-70} duration={500}>
+              <button
+                className="button-48 rounded-md shadow-lg shadow-slate-600 mb-2" // Add margin here
+                onClick={pageToggle}
+              >
+                <span className="text-lg font-bold">MAINNET</span>
+              </button>
+            </Link>
+          ) : (
+            <Link
+              to="/TestNet"
+              spy={true}
+              smooth={true}
+              offset={-70}
+              duration={500}
             >
-              <FcHome className="icon-style" />
-              <span className="text-base font-bold text-white">Home</span>
+              <button
+                className="button-48 rounded-md shadow-lg shadow-slate-600 mb-2" // Add margin here
+                onClick={pageToggle}
+              >
+                <span className="text-lg font-bold">TESTNET</span>
+              </button>
+            </Link>
+          )}
+          <Link
+            to="/testnetpool"
+            spy={true}
+            smooth={true}
+            offset={-70}
+            duration={500}
+          >
+            <button
+              className="button-48 rounded-md shadow-lg shadow-slate-600 mb-2" // Add margin here
+              onClick={pageToggle}
+            >
+              <span className="text-lg font-bold">Create Pool</span>
             </button>
-          </Link> */}
+          </Link>
 
           <ConnectWallet theme="dark" />
         </div>

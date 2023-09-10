@@ -127,16 +127,27 @@ export const Home = () => {
     }
   };
   const changeChainID = async () => {
-    if (status === "connected") {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const chainId = await signer.getChainId();
-      setPageChainId(chainId);
-      if (chainId !== 1) {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x1" }],
-        });
+    try {
+      if (status === "connected") {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const chainId = await signer.getChainId();
+        setPageChainId(chainId);
+        if (chainId !== 1) {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [
+              {
+                chainId: "0x1",
+              },
+            ],
+          });
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      if (err.message === "User rejected the request.") {
+        alert("Please Connect to Mainnet");
       }
     }
   };

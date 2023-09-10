@@ -54,6 +54,9 @@ export const TokenPopUp = ({ onClose }) => {
       }
     } catch (err) {
       console.log(err);
+      if (err.message === "User rejected the request.") {
+        alert("Please accept the transaction to continue");
+      }
     }
   };
   return (
