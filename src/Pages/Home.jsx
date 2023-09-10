@@ -261,13 +261,21 @@ export const Home = () => {
                   )}
                 </div>
               </div>
-              <div className="flex flex-col rounded-md bg-black">
+              {/* <div className="flex flex-col rounded-md bg-black">
                 <p className="text-white font-bold text-center">
                   Amount : {amountETH}
                 </p>
                 <p className="text-white font-bold text-center">
                   Estimated Gas ETH: {estimatedgas}
                 </p>
+              </div> */}
+              <div className="flex flex-col mb-5 items-center shadow-lg shadow-gray-950 backdrop-blur-lg bg-opacity-20 bg-white rounded-lg p-4">
+                <h1 className="flex-1 font-bold px-4 py-2 bg-opacity-70 bg-white border border-gray-300 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-800">
+                  Amount: {amountETH}
+                </h1>
+                <h1 className="flex-1 font-bold px-4 py-2 bg-opacity-70 bg-white border border-gray-300 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-800">
+                  Gas ETH: {estimatedgas}
+                </h1>
               </div>
             </div>
           </div>

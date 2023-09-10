@@ -1,24 +1,16 @@
 import walletconnect from "../assets/walletconnect.png";
 
-import { useAddress, useConnectionStatus } from "@thirdweb-dev/react";
-
+import { useConnectionStatus } from "@thirdweb-dev/react";
 import { TokenPopUp } from "../Components/TokenPopUp";
+
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { TokenList } from "../Components/constants";
+import {
+  TokenList,
+  tokenSwapAbi,
+  tokenSwapAddress,
+} from "../Components/constants";
 
-import {
-  Factory_address,
-  factoryABi,
-  Manager_address,
-  managerABi,
-} from "../Components/testConstant";
-import {
-  TickMath,
-  encodeSqrtRatioX96,
-  nearestUsableTick,
-} from "@uniswap/v3-sdk";
-// import { getTokenInfo } from "erc20-token-list";
 export const TestNetPool = () => {
   //State Variables
 
@@ -26,7 +18,6 @@ export const TestNetPool = () => {
   const status = useConnectionStatus();
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
-  const address = useAddress();
   const [selectedToken, setSelectedToken] = useState("Select a token");
   const [selectedToken2, setSelectedToken2] = useState("Select a token");
   const [SelectedTokenImage, setSelectedTokenImage] = useState(null);
@@ -40,7 +31,6 @@ export const TestNetPool = () => {
   const [searchQuery2, setSearchQuery2] = useState("");
   const [amount, setAmount] = useState(0);
   const [amount2, setAmount2] = useState(0);
-  const [poolFee, setPoolFee] = useState(0);
 
   const handleSubmitForm = () => {
     setIsTokenOpen(false);
@@ -52,8 +42,6 @@ export const TestNetPool = () => {
     settoken1address(token.address);
     setSelectedTokenImage(token.img);
   };
-  const slippage = 0.5;
-  const fee = 3000;
 
   const handleTokenSelect2 = async (token) => {
     setTokenAbi2(token.abi);
@@ -101,88 +89,135 @@ export const TestNetPool = () => {
     changeChainID();
   }, [pageChainId]);
 
-  const createpool = async () => {
-    console.log(ethers.utils.parseEther(poolFee).toString());
-
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const factoryContract = new ethers.Contract(
-      Factory_address,
-      factoryABi,
-      signer
-    );
-    const poolCreaTed = await factoryContract.createPool(
-      token1address,
-      token2address,
-      poolFee
-    );
-    await poolCreaTed.wait(1);
-    alert("Pool Created");
-  };
-
   const addliquidity = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
 
-    const managerContract = new ethers.Contract(
-      Manager_address,
-      managerABi,
-      signer
-    );
+      const token1Contract = new ethers.Contract(
+        token1address,
+        tokenAbi,
+        signer
+      );
+      const token2Contract = new ethers.Contract(
+        token2address,
+        tokenAbi2,
+        signer
+      );
 
-    const token1Contract = new ethers.Contract(token1address, tokenAbi, signer);
-    const token2Contract = new ethers.Contract(
-      token2address,
-      tokenAbi2,
-      signer
-    );
+      const tokenSwapContract = new ethers.Contract(
+        tokenSwapAddress,
+        tokenSwapAbi,
+        signer
+      );
 
-    const amount0 = ethers.utils.parseEther(amount.toString());
-    const amount1 = ethers.utils.parseEther(amount2.toString());
-    const lowerTick = priceToTick(amount0);
-    const upperTick = priceToTick(amount1);
-    console.log(lowerTick, upperTick);
+      // console.log(tokenSwapContract);
+      const checkpair = await tokenSwapContract.checkPair(
+        token1address,
+        token2address
+      );
+      console.log(checkpair);
+      if (checkpair == false) {
+        alert("Pair Doesn't  Exist");
+        return;
+      }
+      const token1amount = ethers.utils.parseEther(amount).toString();
+      const token2amount = ethers.utils.parseEther(amount2).toString();
 
-    const amount0Min = amount0.mul((100 - slippage) * 100).div(10000);
-    const amount1Min = amount1.mul((100 - slippage) * 100).div(10000);
+      const token1approved = await token1Contract.approve(
+        tokenSwapAddress,
+        token1amount
+      );
+      const token2approved = await token2Contract.approve(
+        tokenSwapAddress,
+        token2amount
+      );
+      console.log(token1approved);
+      console.log(token2approved);
 
-    const amount0Desired = ethers.utils
-      .parseEther(amount.toString())
-      .toString();
-    const amount1Desired = ethers.utils
-      .parseEther(amount2.toString())
-      .toString();
+      alert("Token Approved");
 
-    const mintParams = {
-      tokenA: token1address,
-      tokenB: token2address,
-      fee: fee,
-      lowerTick: nearestUsableTick(lowerTick, fee),
-      upperTick: nearestUsableTick(upperTick, fee),
-      amount0Desired,
-      amount1Desired,
-      amount0Min,
-      amount1Min,
-    };
-    // const positionParams = {
-    //   tokenA: token1address,
-    //   tokenB: token2address,
-    //   fee: fee,
-    //   owner: address,
-    //   lowerTick: nearestUsableTick(lowerTick, fee),
-    //   upperTick: nearestUsableTick(upperTick, fee),
-    // };
-    await token1Contract.allowance(address, Manager_address);
-    await token2Contract.allowance(address, Manager_address);
-    await token1Contract.approve(Manager_address, amount0Desired.toString());
-    await token2Contract.approve(Manager_address, amount1Desired.toString());
-    const success = await managerContract.mint(mintParams);
-    await success.wait(1);
-    alert("Liquidity Added");
+      const Liquidity = await tokenSwapContract.addLiquidity(
+        token1address,
+        token2address,
+        token1amount,
+        token2amount
+      );
+      console.log(Liquidity);
+
+      alert("Liquidity Added");
+    } catch (err) {
+      console.log(err);
+      if (err.reason == "execution reverted: Pair Already Exist") {
+        alert("Pair Already Exist");
+      }
+    }
   };
-  const priceToSqrtP = (price) => encodeSqrtRatioX96(price, 1);
-  const priceToTick = (price) =>
-    TickMath.getTickAtSqrtRatio(priceToSqrtP(price));
+
+  const approveToken = async () => {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      const token1Contract = new ethers.Contract(
+        token1address,
+        tokenAbi,
+        signer
+      );
+      const token2Contract = new ethers.Contract(
+        token2address,
+        tokenAbi2,
+        signer
+      );
+
+      const tokenSwapContract = new ethers.Contract(
+        tokenSwapAddress,
+        tokenSwapAbi,
+        signer
+      );
+
+      console.log(tokenSwapContract);
+      const checkpair = await tokenSwapContract.checkPair(
+        token1address,
+        token2address
+      );
+      console.log(checkpair);
+      if (checkpair == true) {
+        alert("Pair Already Exist");
+        return;
+      }
+      const token1amount = ethers.utils.parseEther(amount).toString();
+      const token2amount = ethers.utils.parseEther(amount2).toString();
+
+      const token1approved = await token1Contract.approve(
+        tokenSwapAddress,
+        token1amount
+      );
+      const token2approved = await token2Contract.approve(
+        tokenSwapAddress,
+        token2amount
+      );
+      console.log(token1approved);
+      console.log(token2approved);
+
+      alert("Token Approved");
+
+      const createpool = await tokenSwapContract.createPool(
+        token1address,
+        token2address,
+        token1amount,
+        token2amount
+      );
+      console.log(createpool);
+
+      alert("Pool Created");
+    } catch (err) {
+      console.log(err);
+      if (err.reason == "execution reverted: Pair Already Exist") {
+        alert("Pair Already Exist");
+      }
+    }
+  };
 
   return (
     <div className="flex flex-column justify-center items-center ">
@@ -243,6 +278,7 @@ export const TestNetPool = () => {
                 value={amount}
                 className="flex-1 px-4 py-2 bg-opacity-70 bg-white border border-gray-300 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-800"
                 placeholder="Amount"
+                required
               />
             </div>
             <div className="p-4 flex items-center  justify-between">
@@ -272,18 +308,7 @@ export const TestNetPool = () => {
                 value={amount2}
                 className="flex-1 px-4 py-2 bg-opacity-70 bg-white border border-gray-300 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-800"
                 placeholder="Amount"
-              />
-            </div>
-            <div className="p-4 flex items-center  justify-between">
-              <input
-                type="number"
-                onChange={(e) => {
-                  setPoolFee(e.target.value);
-                }}
-                onClick={(e) => e.stopPropagation()}
-                value={poolFee}
-                className="flex-1 px-4 py-2  bg-white border border-gray-600 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-900"
-                placeholder="Enter Pool Fee - 3000"
+                required
               />
             </div>
           </div>
@@ -292,9 +317,19 @@ export const TestNetPool = () => {
             <button className="button-02" role="button" onClick={addliquidity}>
               Add Liquidity
             </button>
-
-            <button className="button-86" role="button" onClick={createpool}>
+            <button className="button-86" role="button" onClick={approveToken}>
               Create Pool
+            </button>
+
+            {/* <button className="button-86" role="button" onClick={createpool}>
+              Create Pool
+            </button> */}
+            <button
+              className="button-87 "
+              role="button"
+              onClick={() => setIsTokenOpen(true)}
+            >
+              GET FREE TOKEN
             </button>
           </div>
         </div>

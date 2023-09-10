@@ -1,25 +1,15 @@
 import walletconnect from "../assets/walletconnect.png";
 
-import { useAddress, useConnectionStatus } from "@thirdweb-dev/react";
+import { useConnectionStatus } from "@thirdweb-dev/react";
 
 import { TokenPopUp } from "../Components/TokenPopUp";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import PathFinder from "../Components/pathFinder";
-import debounce from "../Components/debounce";
-import { TokenList, poolAddress } from "../Components/constants";
 import {
-  Factory_address,
-  factoryABi,
-  nftManagerABi,
-  Manager_address,
-  managerABi,
-  Pool_Address,
-  v3PoolAbi,
-  NFTManager_address,
-  quoterAbi,
-  Quoter_address,
-} from "../Components/testConstant";
+  TokenList,
+  tokenSwapAbi,
+  tokenSwapAddress,
+} from "../Components/constants";
 
 export const TestNet = () => {
   //State Variables
@@ -28,7 +18,6 @@ export const TestNet = () => {
   const status = useConnectionStatus();
   const [openModal, setOpenModal] = useState(false);
   const [openModal2, setOpenModal2] = useState(false);
-  const address = useAddress();
   const [selectedToken, setSelectedToken] = useState("Select a token");
   const [selectedToken2, setSelectedToken2] = useState("Select a token");
   const [SelectedTokenImage, setSelectedTokenImage] = useState(null);
@@ -40,37 +29,43 @@ export const TestNet = () => {
   const [pageChainId, setPageChainId] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchQuery2, setSearchQuery2] = useState("");
-  const [slippage, setSlippage] = useState(0.1);
-  const [path, setPath] = useState();
-  const [pathFinder, setPathFinder] = useState();
+  const [tokenExpected, setTokenExpected] = useState(0);
+  const [token1reserve, setToken1Reserve] = useState(0);
+  const [token2reserve, setToken2Reserve] = useState(0);
 
   // const [isApproved, setIsApproved] = useState(true);
 
   const [amount, setAmount] = useState(0);
-  const [amount2, setAmount2] = useState(0);
-
-  const pairsToTokens = (pairs) => {
-    const tokens = pairs.reduce((acc, pair) => {
-      acc[pair.token0.address] = {
-        symbol: pair.token0.symbol,
-        address: pair.token0.address,
-        selected: false,
-      };
-      acc[pair.token1.address] = {
-        symbol: pair.token1.symbol,
-        address: pair.token1.address,
-        selected: false,
-      };
-
-      return acc;
-    }, {});
-
-    return Object.keys(tokens).map((k) => tokens[k]);
-  };
 
   const handleSubmitForm = (formData) => {
     setIsTokenOpen(false);
   };
+
+  const reserverAmount = async () => {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const tokenSwapContract = new ethers.Contract(
+        tokenSwapAddress,
+        tokenSwapAbi,
+        signer
+      );
+      const reserve = await tokenSwapContract.showReserve(
+        token1address,
+        token2address
+      );
+      // console.log(reserve);
+      const reserveAmount = ethers.utils.formatEther(reserve[0]).toString();
+      const reserveAmount2 = ethers.utils.formatEther(reserve[1]).toString();
+      setToken1Reserve(reserveAmount);
+      setToken2Reserve(reserveAmount2);
+    } catch (err) {
+      // console.log(err);
+    }
+  };
+  useEffect(() => {
+    reserverAmount();
+  }, [selectedToken, selectedToken2]);
 
   const handleTokenSelect = async (token) => {
     setTokenAbi(token.abi);
@@ -121,56 +116,72 @@ export const TestNet = () => {
     }
   };
 
-  const countPathTokens = (path) => (path.length - 1) / 2 + 1;
-
-  const pathToTypes = (path) => {
-    return ["address"].concat(
-      new Array(countPathTokens(path) - 1).fill(["uint24", "address"]).flat()
-    );
-  };
-
   useEffect(() => {
     changeChainID();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageChainId]);
+  const expectedAmount = async () => {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const tokenSwapContract = new ethers.Contract(
+        tokenSwapAddress,
+        tokenSwapAbi,
+        signer
+      );
+      const tokenAmount = ethers.utils.parseEther(amount).toString();
+      const expected = await tokenSwapContract.estimatedReturn(
+        token1address,
+        token2address,
+        tokenAmount
+      );
+      const expectedAmount = ethers.utils.formatEther(expected).toString();
+      setTokenExpected(expectedAmount);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  useEffect(() => {
+    expectedAmount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount]);
 
   const swapToken = async () => {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-
-      //Create Contract
-
-      const token1Contract = new ethers.Contract(
+      const tokenSwapContract = new ethers.Contract(
+        tokenSwapAddress,
+        tokenSwapAbi,
+        signer
+      );
+      const tokenAmount = ethers.utils.parseEther(amount).toString();
+      const token1contract = new ethers.Contract(
         token1address,
         tokenAbi,
         signer
       );
-      const token2Contract = new ethers.Contract(
+      const checkpair = await tokenSwapContract.checkPair(
+        token1address,
+        token2address
+      );
+      //  console.log(checkpair);
+      if (checkpair == false) {
+        alert("Pair Doesn't  Exist");
+        return;
+      }
+      const approveToken = await token1contract.approve(
+        tokenSwapAddress,
+        tokenAmount
+      );
+      console.log(approveToken);
+      alert("Approve Successful");
+      const swapToken = await tokenSwapContract.swap(
+        token1address,
         token2address,
-        tokenAbi2,
-        signer
+        tokenAmount
       );
-      const managerContract = new ethers.Contract(
-        Manager_address,
-        managerABi,
-        signer
-      );
-      const amountIn = ethers.utils.parseUnits(amount).toString();
-      const amountOut = ethers.utils.parseUnits(amount2);
-      const minAmountOut = amountOut
-        .mul((100 - parseFloat(slippage)) * 100)
-        .div(10000);
-
-      const packedPath = ethers.utils.solidityPack(pathToTypes(path), path);
-
-      const params = {
-        path: packedPath,
-        recipient: address,
-        amountIn: amountIn,
-        minAmountOut: minAmountOut,
-      };
-      token1Contract.approve(Manager_address, amountIn);
-      await managerContract.swap(params);
+      console.log(swapToken);
       alert("Swap Successful");
     } catch (err) {
       console.log(err);
@@ -197,11 +208,11 @@ export const TestNet = () => {
       ) : (
         <div className="flex  flex-col items-center mt-32 justify-center m-5 mx-4 px-1 md:mx-16 rounded-lg transform transition-all duration-300 shadow-2xl shadow-cyan-400">
           <div className="flex flex-col mb-5 items-center shadow-lg shadow-purple-950 backdrop-blur-lg bg-opacity-20 bg-white rounded-lg p-4">
-            <h1 className="text-4xl font-bold mr-2 text-gray-600 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-              MUMBAI TESTNET
+            <h1 className="text-4xl font-bold mr-2 text-gray-600 bg-clip-text text-transparent bg-gradient-to-r from-gray-500 to-gray-800">
+              Sepolia TESTNET
             </h1>
             <img
-              src="https://cryptologos.cc/logos/polygon-matic-logo.svg?v=026" // Replace with your online logo image URL
+              src="https://cryptologos.cc/logos/senso-senso-logo.svg?v=026" // Replace with your online logo image URL
               alt="Logo"
               className="w-8 h-10" // Adjust the width and height as needed
             />
@@ -258,22 +269,39 @@ export const TestNet = () => {
               </div>
 
               <div className="flex flex-col mb-5 items-center shadow-lg shadow-gray-950 backdrop-blur-lg bg-opacity-20 bg-white rounded-lg p-4">
-                {/* <h1 className="text-lg font-bold mr-2 text-gray-600 bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-900">
-                  Reserve :
+                <h1 className="flex-1 font-bold px-4 py-2 bg-opacity-70 bg-white border border-gray-300 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-800">
+                  {tokenExpected}
                 </h1>
-                <h1 className="text-lg font-bold mr-2 text-gray-600 bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-900">
-                  Reserve :
-                </h1> */}
-                <input
-                  type="number"
-                  onChange={(e) => {
-                    setAmount2(e.target.value);
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                  value={amount2}
-                  className="flex-1 px-4 py-2 bg-opacity-70 bg-white border border-gray-300 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-800"
-                  placeholder="Amount"
-                />
+              </div>
+            </div>
+            <div className="p-1 flex items-center  justify-between">
+              <div className="flex-1 cursor-pointer px-4 py-2 bg-opacity-70 backdrop-filter backdrop-blur-lg  border border-gray-300 hover:shadow-xl hover:bg-opacity-80 focus:ring-4 focus:ring-purple-400 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:border-purple-400 text-white">
+                <span
+                  className="text-xl cursor-pointer  font-bold text-gray-900 m-1"
+                  onClick={reserverAmount}
+                >
+                  {selectedToken}
+                </span>
+              </div>
+              <div className="flex-1 px-4 py-2  bg-white border border-gray-600 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-900">
+                <span className="text-xl font-bold text-gray-900 m-1">
+                  {token1reserve} MATIC
+                </span>
+              </div>
+            </div>
+            <div className="p-1 flex items-center  justify-between">
+              <div className="flex-1 cursor-pointer px-4 py-2 bg-opacity-70 backdrop-filter backdrop-blur-lg  border border-gray-300 hover:shadow-xl hover:bg-opacity-80 focus:ring-4 focus:ring-purple-400 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:border-purple-400 text-white">
+                <span
+                  className="text-xl cursor-pointer font-bold text-gray-900 m-1"
+                  onClick={reserverAmount}
+                >
+                  {selectedToken2}
+                </span>
+              </div>
+              <div className="flex-1 px-4 py-2  bg-white border border-gray-600 backdrop-blur-md focus:ring-2 focus:ring-blue-400 rounded-lg transition duration-300 ease-in-out hover:shadow-md focus:outline-none focus:border-blue-400 text-gray-900">
+                <span className="text-xl text-center font-bold text-gray-900 m-1">
+                  {token2reserve} MATIC
+                </span>
               </div>
             </div>
           </div>

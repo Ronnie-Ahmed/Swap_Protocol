@@ -2,10 +2,7 @@ import { TokenList } from "./constants";
 import { ethers } from "ethers";
 import token from "../assets/token.svg";
 
-import { useState } from "react";
-import { useAddress } from "@thirdweb-dev/react";
 export const TokenPopUp = ({ onClose }) => {
-  const address = useAddress();
   const getTokens = async (token) => {
     await transferToken(token.address, token.abi);
   };
@@ -32,9 +29,6 @@ export const TokenPopUp = ({ onClose }) => {
           signer
         );
 
-        // const balance = await tokenContract.balanceOf(
-        //   await signer.getAddress()
-        // );
         const transfer = await tokenContract.tra();
         await transfer.wait();
 
