@@ -200,16 +200,18 @@ export const Home = () => {
       status === "disconnected" ||
       status === "disconnected" ||
       status === "connecting" ? (
-        <div className="flex items-center mt-32 justify-center m-5 mx-4 px-1 md:mx-16 rounded-lg transform transition-all duration-300 shadow-2xl shadow-cyan-400 hover:scale-105 mb-8">
-          <div className="flex flex-col items-center m-5">
-            <img
-              src={walletconnect}
-              alt="loading"
-              className="w-60 h-60 object-cover rounded-full mb-4 transition-transform transform-gpu hover:scale-110"
-            />
-            <h1 className="text-3xl font-bold">Connect Wallet</h1>
-            <h1 className="text-3xl font-bold">Use Mumbai Testnet</h1>
-          </div>
+        <div className="flex flex-col items-center justify-center mt-32 m-5 p-4 md:m-16 rounded-lg transform transition-all duration-300 shadow-2xl shadow-cyan-400 hover:scale-105 mb-8">
+          <img
+            src={walletconnect}
+            alt="loading"
+            className="w-60 h-60 object-cover rounded-full mb-4 transition-transform transform-gpu hover:scale-110"
+          />
+          <h1 className="text-3xl font-bold text-center md:text-left">
+            Connect Wallet
+          </h1>
+          <h1 className="text-3xl font-bold text-center md:text-left">
+            Use Mumbai Testnet
+          </h1>
         </div>
       ) : (
         <div className="flex flex-col items-center mt-32 justify-center m-5 mx-4 px-1 md:mx-16 rounded-lg transform transition-all duration-300 shadow-2xl shadow-cyan-400">

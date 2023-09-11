@@ -35,9 +35,9 @@ export const Header = () => {
   }, []);
   return (
     <header className="fixed top-0 left-0 z-50 text-white py-1 w-full">
-      <nav className="flex items-center justify-between px-4 ">
+      <nav className="flex items-center justify-between px-4">
         <Link to="/">
-          <div className="flex items-center curson-point  hover:border-blue-500 rounded-md p-2 ">
+          <div className="flex items-center cursor-pointer hover:border-blue-500 rounded-md p-2">
             <img
               src={nfticon}
               alt="Logo"
@@ -57,7 +57,7 @@ export const Header = () => {
                 className="button-48 rounded-md shadow-lg shadow-slate-600"
                 onClick={pageToggle}
               >
-                <span className="text-lg font-bold ">MAINNET</span>
+                <span className="text-lg font-bold">MAINNET</span>
               </button>
             </Link>
           ) : (
@@ -72,7 +72,7 @@ export const Header = () => {
                 className="button-48 rounded-md shadow-lg shadow-slate-600"
                 onClick={pageToggle}
               >
-                <span className="text-lg font-bold ">TESTNET</span>
+                <span className="text-lg font-bold">TESTNET</span>
               </button>
             </Link>
           )}
@@ -87,11 +87,11 @@ export const Header = () => {
               className="button-48 rounded-md shadow-lg shadow-slate-600"
               onClick={pageToggle}
             >
-              <span className="text-lg font-bold ">Create Pool</span>
+              <span className="text-lg font-bold">Create Pool</span>
             </button>
           </Link>
 
-          <div className="flex flex-row space-between center p-1">
+          <div className="flex flex-row space-x-4">
             {active && <ConnectWallet theme="dark" />}
             {address ? (
               <Link to="/userprofile">
@@ -112,7 +112,7 @@ export const Header = () => {
           </div>
         </div>
 
-        <div className="md:hidden">
+        <div className="md:hidden relative">
           <button
             className="text-white hover:text-gray-300"
             onClick={toggleMenu}
@@ -141,53 +141,56 @@ export const Header = () => {
               )}
             </svg>
           </button>
+          {isOpen && (
+            <div className="absolute top-full right-0 mt-2 space-y-2 bg-white text-black rounded-lg shadow-lg">
+              <Link to="/" spy={true} smooth={true} offset={-70} duration={500}>
+                <button
+                  className="button-48 w-full px-4 py-2 text-left hover:bg-blue-500 hover:text-white"
+                  onClick={pageToggle}
+                >
+                  MAINNET
+                </button>
+              </Link>
+              <Link
+                to="/TestNet"
+                spy={true}
+                smooth={true}
+                offset={-70}
+                duration={500}
+              >
+                <button
+                  className="button-48 w-full px-4 py-2 text-left hover:bg-blue-500 hover:text-white"
+                  onClick={pageToggle}
+                >
+                  TESTNET
+                </button>
+              </Link>
+              <Link
+                to="/testnetpool"
+                spy={true}
+                smooth={true}
+                offset={-70}
+                duration={500}
+              >
+                <button
+                  className="button-48 w-full  px-4 py-2 text-left hover:bg-blue-500 hover:text-white"
+                  onClick={pageToggle}
+                >
+                  Create Pool
+                </button>
+              </Link>
+              <Link to="#" spy={true} smooth={true} offset={-70} duration={500}>
+                <div
+                  className="button-48 w-full  px-4 py-2 text-left hover:bg-blue-500 hover:text-white"
+                  onClick={pageToggle}
+                >
+                  <ConnectWallet theme="dark" />
+                </div>
+              </Link>
+            </div>
+          )}
         </div>
       </nav>
-      {isOpen && (
-        <div className="md:hidden mb-5 py-2 flex flex-col items-center">
-          {nextPage ? (
-            <Link to="/" spy={true} smooth={true} offset={-70} duration={500}>
-              <button
-                className="button-48 rounded-md shadow-lg shadow-slate-600 mb-2" // Add margin here
-                onClick={pageToggle}
-              >
-                <span className="text-lg font-bold">MAINNET</span>
-              </button>
-            </Link>
-          ) : (
-            <Link
-              to="/TestNet"
-              spy={true}
-              smooth={true}
-              offset={-70}
-              duration={500}
-            >
-              <button
-                className="button-48 rounded-md shadow-lg shadow-slate-600 mb-2" // Add margin here
-                onClick={pageToggle}
-              >
-                <span className="text-lg font-bold">TESTNET</span>
-              </button>
-            </Link>
-          )}
-          <Link
-            to="/testnetpool"
-            spy={true}
-            smooth={true}
-            offset={-70}
-            duration={500}
-          >
-            <button
-              className="button-48 rounded-md shadow-lg shadow-slate-600 mb-2" // Add margin here
-              onClick={pageToggle}
-            >
-              <span className="text-lg font-bold">Create Pool</span>
-            </button>
-          </Link>
-
-          <ConnectWallet theme="dark" />
-        </div>
-      )}
     </header>
   );
 };

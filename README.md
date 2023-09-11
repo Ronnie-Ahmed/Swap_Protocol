@@ -55,7 +55,7 @@ npm run dev
 
 ##Project Video
 
-[![Thumbnail](https://github.com/Ronnie-Ahmed/Token_Swap/assets/68500792/e8560bb8-42fd-4a89-98c5-70474efcda7f)](
+[![Thumbnail](https://github.com/Ronnie-Ahmed/Token_Swap/assets/68500792/e8560bb8-42fd-4a89-98c5-70474efcda7f)(
 https://github.com/Ronnie-Ahmed/Token_Swap/assets/68500792/b1816b54-ef1c-4275-8381-522bd6a316e8)
 
 ##Screen Shoots
@@ -67,4 +67,3 @@ https://github.com/Ronnie-Ahmed/Token_Swap/assets/68500792/b1816b54-ef1c-4275-83
 ![Mainnet](https://github.com/Ronnie-Ahmed/Token_Swap/assets/68500792/e8560bb8-42fd-4a89-98c5-70474efcda7f)
 
 ![testnet](https://github.com/Ronnie-Ahmed/Token_Swap/assets/68500792/dd59ad25-dd0a-4ecc-ba7c-7116827ab1bd)
-
