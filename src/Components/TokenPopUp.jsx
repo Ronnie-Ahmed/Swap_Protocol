@@ -63,11 +63,9 @@ export const TokenPopUp = ({ onClose }) => {
     <div className="fixed top-0 left-0 w-screen h-screen flex items-center justify-center bg-gray-400 bg-opacity-0">
       <div className="max-w-md w-full p-6 duration-300 space-x-4 bg-gradient-to-b bg-gray-800 rounded-lg shadow-2xl bg-opacity-80">
         <div className="flex flex-col space-y-4 max-h-60 overflow-auto">
-          {" "}
-          {/* Add max height and overflow */}
           {TokenList.map((token, index) => (
             <button
-              className="button-85 m-3 bg-gradient-conic font-bold hover:bg-white focus-visible:ring-0"
+              className="button-85 m-3 bg-gradient-conic font-bold hover:bg-white active:bg-gray-600 focus-visible:ring-0 transform hover:scale-105 active:scale-95 transition-all duration-300"
               onClick={() => getTokens(token)}
               key={index}
             >
@@ -83,7 +81,7 @@ export const TokenPopUp = ({ onClose }) => {
 
         <div className="flex mt-10 justify-center">
           <button
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-full transform hover:scale-110 transition-all duration-300"
+            className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-semibold py-3 px-6 rounded-full transform hover:scale-110 active:scale-95 transition-all duration-300"
             onClick={onClose}
           >
             Close
