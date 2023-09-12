@@ -43,7 +43,7 @@ npm run dev
 
 - [@Ronnie Ahmed_Github](https://www.github.com/Ronnie-Ahmed)
 - [@Ronnie Ahmed_Portfolio](https://portfolio-fl2l.vercel.app/)
-- [@Ronnie Ahmed Linkdin](https://www.linkedin.com/in/ronnie-ahmed-3bb290271/)
+- [@Ronnie Ahmed Linkdin](https://www.linkedin.com/in/ronnie-ahmed/)
 
 ## Tech Stack
 
