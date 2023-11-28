@@ -45,7 +45,7 @@ export const Header = () => {
             />
 
             <button className="button-49 flex items-center justify-center">
-              <label className="content">Token Swap</label>
+              <label className="content">Swap Protocol</label>
             </button>
           </div>
         </Link>
